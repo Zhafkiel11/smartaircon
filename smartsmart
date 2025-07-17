@@ -1,0 +1,111 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class SmartAirConditioning extends JFrame {
+    private boolean power = false;
+    private int temperature = 24;
+    private String mode = "Cool";
+    private String fanSpeed = "Medium";
+
+    // UI Components
+    private JLabel statusLabel, tempLabel;
+    private JButton powerButton, increaseTempButton, decreaseTempButton;
+    private JComboBox<String> modeBox, fanSpeedBox;
+
+    public SmartAirConditioning() {
+        setTitle("Smart Air Conditioning System");
+        setSize(400, 300);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new GridLayout(6, 1, 10, 10));
+
+        // Power Button
+        powerButton = new JButton("Power: OFF");
+        powerButton.addActionListener(e -> togglePower());
+        add(powerButton);
+
+        // Temperature Controls
+        JPanel tempPanel = new JPanel();
+        tempLabel = new JLabel("Temperature: " + temperature + "°C");
+        increaseTempButton = new JButton("+");
+        decreaseTempButton = new JButton("-");
+        increaseTempButton.addActionListener(e -> adjustTemperature(1));
+        decreaseTempButton.addActionListener(e -> adjustTemperature(-1));
+        tempPanel.add(decreaseTempButton);
+        tempPanel.add(tempLabel);
+        tempPanel.add(increaseTempButton);
+        add(tempPanel);
+
+        // Mode Selector
+        modeBox = new JComboBox<>(new String[]{"Cool", "Heat", "Fan"});
+        modeBox.addActionListener(e -> changeMode((String) modeBox.getSelectedItem()));
+        add(new JLabel("Mode:"));
+        add(modeBox);
+
+        // Fan Speed Selector
+        fanSpeedBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
+        fanSpeedBox.addActionListener(e -> changeFanSpeed((String) fanSpeedBox.getSelectedItem()));
+        add(new JLabel("Fan Speed:"));
+        add(fanSpeedBox);
+
+        // Status Label
+        statusLabel = new JLabel("System is OFF", SwingConstants.CENTER);
+        add(statusLabel);
+
+        updateUIState();
+    }
+
+    private void togglePower() {
+        power = !power;
+        updateUIState();
+    }
+
+    private void adjustTemperature(int delta) {
+        if (power) {
+            temperature += delta;
+            tempLabel.setText("Temperature: " + temperature + "°C");
+            updateStatus();
+        }
+    }
+
+    private void changeMode(String newMode) {
+        if (power) {
+            mode = newMode;
+            updateStatus();
+        }
+    }
+
+    private void changeFanSpeed(String newSpeed) {
+        if (power) {
+            fanSpeed = newSpeed;
+            updateStatus();
+        }
+    }
+
+    private void updateUIState() {
+        powerButton.setText("Power: " + (power ? "ON" : "OFF"));
+        boolean enabled = power;
+        increaseTempButton.setEnabled(enabled);
+        decreaseTempButton.setEnabled(enabled);
+        modeBox.setEnabled(enabled);
+        fanSpeedBox.setEnabled(enabled);
+        updateStatus();
+    }
+
+    private void updateStatus() {
+        if (power) {
+            statusLabel.setText(
+                "<html>Status:<br>Mode: " + mode +
+                "<br>Temp: " + temperature + "°C" +
+                "<br>Fan: " + fanSpeed + "</html>"
+            );
+        } else {
+            statusLabel.setText("System is OFF");
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new SmartAirConditioning().setVisible(true));
+    }
+}
